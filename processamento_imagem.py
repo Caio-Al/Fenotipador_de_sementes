@@ -95,7 +95,8 @@ class ProcessadorImagem:
         gray    = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        #_, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 31, 4)
 
         im_floodfill = thresh.copy()
         h, w = thresh.shape[:2]
@@ -136,3 +137,63 @@ class ProcessadorImagem:
         self._salvar_diagnosticos(gray, blurred, thresh, thresh_filled, opening, sure_bg, dist_transform, sure_fg, unknown)
 
         return img, gray, opening, contornos_separados, px_por_cm
+
+    """def obter_contornos(self, caminho_imagem):
+        img = cv2.imread(caminho_imagem)
+        if img is None:
+            raise FileNotFoundError(f"Erro: Imagem não encontrada em {caminho_imagem}")
+
+        px_por_cm, bbox_rosa = self.detectar_fator_escala(img, tamanho_real_cm=1.0)
+
+        gray    = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (7, 7), 0)  # kernel maior — suaviza mais
+
+        _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+        im_floodfill = thresh.copy()
+        h, w = thresh.shape[:2]
+        mask = np.zeros((h + 2, w + 2), np.uint8)
+        cv2.floodFill(im_floodfill, mask, (0, 0), 255)
+        thresh_filled = thresh | cv2.bitwise_not(im_floodfill)
+
+        kernel  = np.ones((3, 3), np.uint8)
+        opening = cv2.morphologyEx(thresh_filled, cv2.MORPH_OPEN, kernel, iterations=2)
+
+        sure_bg        = cv2.dilate(opening, kernel, iterations=3)
+        dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+
+        # ── Ponto crítico: threshold mais baixo separa sementes próximas ──
+        # 0.5 é agressivo demais quando sementes se tocam levemente
+        # 0.3 preserva mais regiões individuais
+        _, sure_fg = cv2.threshold(dist_transform, 0.30 * dist_transform.max(), 255, 0)
+        sure_fg    = np.uint8(sure_fg)
+        unknown    = cv2.subtract(sure_bg, sure_fg)
+
+        _, markers = cv2.connectedComponents(sure_fg)
+        markers = markers + 1
+        markers[unknown == 255] = 0
+        markers = cv2.watershed(img, markers)
+
+        # ── Limiar de área menor — captura sementes pequenas/parciais ──
+        # O valor anterior de 150 descartava sementes menores da borda
+        LIMIAR_AREA = 80
+
+        contornos_separados = []
+        for marker_id in np.unique(markers):
+            if marker_id <= 1:
+                continue
+            mascara_individual = np.zeros(gray.shape, dtype="uint8")
+            mascara_individual[markers == marker_id] = 255
+            cnts, _ = cv2.findContours(mascara_individual, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            if len(cnts) > 0:
+                c = max(cnts, key=cv2.contourArea)
+                if cv2.contourArea(c) > LIMIAR_AREA:
+                    if self._contorno_dentro_bbox(c, bbox_rosa):
+                        print(f"[Escala] Contorno excluído (quadrado de referência)")
+                        continue
+                    contornos_separados.append(c)
+
+        self._salvar_diagnosticos(gray, blurred, thresh, thresh_filled, opening,
+                                sure_bg, dist_transform, sure_fg, unknown)
+
+        return img, gray, opening, contornos_separados, px_por_cm"""
