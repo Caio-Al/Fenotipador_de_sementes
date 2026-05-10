@@ -1024,10 +1024,23 @@ async function abrirModalCamera() {
   status.textContent = "Abrindo câmera...";
 
   try {
-    streamCamera = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1920 } },
-      audio: false
-    });
+        streamCamera = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 4032 }, height: { ideal: 3024 } },
+          audio: false
+        });
+        try {
+          const track = streamCamera.getVideoTracks()[0];
+          const capabilities = track.getCapabilities();
+          if (capabilities.zoom) {
+            const zoomAlvo = Math.min(2.0, capabilities.zoom.max);
+            await track.applyConstraints({ advanced: [{ zoom: zoomAlvo }] });
+            status.textContent = `🔍 Zoom ${zoomAlvo}x ativo.`;
+          } else {
+            status.textContent = "⚠ Zoom não suportado. Use câmera 1x manualmente.";
+          }
+        } catch (e) {
+          console.warn("Zoom falhou:", e);
+        }
     video.srcObject = streamCamera;
     status.textContent = "📐 Posicione as sementes no campo de visão.\nToque em Fotografar quando estiver pronto.";
     document.getElementById("btn-disparar").disabled = false;
