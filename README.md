@@ -1,8 +1,6 @@
 # Sistema de Fenotipagem Web
 
-## O que mudou em relação ao pré-TCC
-
-| Agora                              |
+| Composição                         |
 |------------------------------------|
 | Computador comum + celular         |
 | Câmera do celular via browser      |
