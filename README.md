@@ -1,16 +1,13 @@
-# Sistema de Fenotipagem — Versão Web (Celular)
+# Sistema de Fenotipagem Web
 
 ## O que mudou em relação ao pré-TCC
 
-| Antes                     | Agora                              |
-|---------------------------|------------------------------------|
-| Raspberry Pi 4 + câmera   | Computador comum + celular         |
-| Picamera2 (CSI)           | Câmera do celular via browser      |
-| hardware_camera.py        | **api.py** (Flask)                 |
-| Rodar main.py localmente  | Acessar site no celular            |
-
-> Os arquivos `processamento_imagem.py`, `extracao_dados.py` e `exportador_pdf.py`
-> **não foram alterados**. A mudança foi cirúrgica: só a camada de captura mudou.
+| Agora                              |
+|------------------------------------|
+| Computador comum + celular         |
+| Câmera do celular via browser      |
+| **api.py** (Flask)                 |
+| Acessar site no celular            |
 
 ---
 
@@ -18,15 +15,15 @@
 
 ```
 projeto/
-├── api.py                      ← NOVO: backend Flask (substitui hardware_camera.py)
-├── processamento_imagem.py     ← sem alteração
-├── extracao_dados.py           ← sem alteração
-├── exportador_pdf.py           ← sem alteração
-├── main.py                     ← ainda pode ser usado para testes locais
-├── requirements.txt            ← atualizado com flask e flask-cors
+├── api.py                      
+├── processamento_imagem.py    
+├── extracao_dados.py           
+├── exportador_pdf.py           
+├── main.py                    
+├── requirements.txt           
 ├── templates/
-│   └── index.html              ← NOVO: interface web para o celular
-└── resultados/                 ← gerado automaticamente
+│   └── index.html             
+└── resultados/                 
 ```
 
 ---
